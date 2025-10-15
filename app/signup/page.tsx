@@ -22,19 +22,42 @@ export default function SignupPage() {
   })
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      router.push(userType === "donor" ? "/donor/dashboard" : "/patient/dashboard")
-    }, 1500)
-  }
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    // ✅ Simple validation checks
+    const { name, email, password, phone, bloodType, location } = formData
+
+    if (!name || !email || !password || !phone || !bloodType || !location) {
+      console.log("❌ Please fill in all fields.")
+      return
+    }
+
+    // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    //   console.log("❌ Invalid email format.")
+    //   return
+    // }
+
+    // if (password.length < 6) {
+    //   console.log("❌ Password must be at least 6 characters.")
+    //   return
+    // }
+
+    // ✅ Log form data to console
+    console.log("✅ User Type:", userType)
+    console.log("✅ Form Data:", formData)
+
+    // Simulate API call
+    setIsLoading(true)
+    setTimeout(() => {
+      setIsLoading(false)
+      console.log("✅ Account created successfully!")
+      router.push(userType === "donor" ? "/donor/dashboard" : "/patient/dashboard")
+    }, 1500)
   }
 
   return (
@@ -55,7 +78,11 @@ export default function SignupPage() {
             <Button
               type="button"
               variant={userType === "donor" ? "default" : "outline"}
-              className={`flex-1 ${userType === "donor" ? "bg-primary text-primary-foreground" : "border-border text-foreground"}`}
+              className={`flex-1 ${
+                userType === "donor"
+                  ? "bg-primary text-primary-foreground"
+                  : "border-border text-foreground"
+              }`}
               onClick={() => setUserType("donor")}
             >
               I'm a Donor
@@ -63,7 +90,11 @@ export default function SignupPage() {
             <Button
               type="button"
               variant={userType === "patient" ? "default" : "outline"}
-              className={`flex-1 ${userType === "patient" ? "bg-primary text-primary-foreground" : "border-border text-foreground"}`}
+              className={`flex-1 ${
+                userType === "patient"
+                  ? "bg-primary text-primary-foreground"
+                  : "border-border text-foreground"
+              }`}
               onClick={() => setUserType("patient")}
             >
               I Need Blood

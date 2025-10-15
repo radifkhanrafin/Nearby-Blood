@@ -17,14 +17,19 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsLoading(true)
+    const formData = {
+      email,
+      password
+    }
+    console.log("Form Data:", formData)
+    // setIsLoading(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      // Redirect to donor dashboard (in real app, check user type)
-      router.push("/donor/dashboard")
-    }, 1500)
+    // // Simulate API call
+    // setTimeout(() => {
+    //   setIsLoading(false)
+    //   // Redirect to donor dashboard (in real app, check user type)
+    //   router.push("/donor/dashboard")
+    // }, 1500)
   }
 
   return (
