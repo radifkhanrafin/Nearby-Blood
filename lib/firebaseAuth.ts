@@ -52,6 +52,6 @@ export const onAuthUserChanged = (callback: (user: User | null) => void) => {
 };
 
 // Get current logged-in user (synchronously)
-export const getCurrentUser = (): User | null => {
+export const getCurrentUser = () => {
   return auth.currentUser;
 };

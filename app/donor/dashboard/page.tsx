@@ -1,25 +1,55 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import moment from 'moment';
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Droplet, MapPin, Award, Bell, Calendar, Heart, TrendingUp, Users } from "lucide-react" 
-import { getCurrentUser, logoutUser } from "@/lib/firebaseAuth"
+import { Droplet, MapPin, Award, Bell, Calendar, Heart, TrendingUp, Users } from "lucide-react"
+import { logoutUser } from "@/lib/firebaseAuth"
+import useCurrentUser from "../../../lib/useCurrentUser"
+import Loading from "@/app/patient/dashboard/loading"
+
+
 
 export default function DonorDashboard() {
   const [isAvailable, setIsAvailable] = useState(true)
   // const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
 
+  const { currentUser, userData, loading } = useCurrentUser();
+  if (loading) {
+    return <Loading />
+  }
+  console.log(" user from dashboard userData", userData)
 
-  console.log(getCurrentUser)
+
+  const {
+    name,
+    email,
+    phone,
+    gender,
+    profile,
+    dateOfBirth,
+    age,
+    bloodGroup,
+    weightKg,
+    lastDonationDate,
+    isDonor,
+    availability,
+    medicalHistory,
+    registrationId,
+    emergencyContact,
+    presentAddress,
+    permanentAddress,
+  } = userData;
+
   const handleLogout = async () => {
     try {
-      await logoutUser() // call your Firebase signOut
-      // router.push("/login")
+      await logoutUser()
+      // Router.push("/login")
     } catch (err) {
       console.error("Logout failed:", err)
     }
@@ -69,7 +99,7 @@ export default function DonorDashboard() {
                 <div className="absolute right-0 mt-2 w-24 bg-white border border-gray-200 rounded-md shadow-lg">
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-red-500 hover:text-white rounded-md"
+                    className="w-full text-left px-4 py-2 hover:bg-red-500 hover:text-black rounded-md"
                   >
                     Logout
                   </button>
@@ -82,12 +112,64 @@ export default function DonorDashboard() {
         </div>
       </header>
 
+
+
+
+
       <div className="container mx-auto px-4 py-8">
+
+
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back, John!</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back, {name} !</h1>
           <p className="text-muted-foreground">Your contribution is making a difference in your community</p>
         </div>
+
+        <Card className="p-10 bg-card border-2  grid grid-cols-1 md:grid-cols-2 justify-center items-center ">
+
+          {/* Profile and Name */}
+          <div className="text-center mb-4">
+            <Avatar className="h-80 w-60 bg-primary/20 text-primary flex items-center justify-center mx-auto mb-3">
+              {/* <span className="text-2xl font-semibold">JD</span> */}
+              <img src={profile} alt="Images" />
+            </Avatar>
+            <h3 className="font-semibold text-foreground text-2xl">{name}</h3>
+            <p className="text-xl text-muted-foreground">Blood Group: {bloodGroup}</p>
+            <p className=" text-muted-foreground">Blood Donation:  6 times</p>
+            <Badge className="mt-2 bg-chart-3 text-card">Verified Donor</Badge>
+          </div>
+
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Address:</span>
+              <div >
+                <span className="text-foreground"> {presentAddress.street} ,</span>
+                <span className="text-foreground"> {presentAddress.city} ,</span>
+                <span className="text-foreground"> {presentAddress.district}</span>
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">   Last Donation:  </span>
+              <div className="flex flex-col">
+                <span className="text-foreground"> {moment(lastDonationDate).format("MMM Do YY")} </span>
+              <span className="text-foreground">  {moment(lastDonationDate).endOf('day').fromNow() } </span>
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Next Eligible:</span>
+              <span className="text-foreground"></span>
+            </div>
+          </div>
+
+
+          <Button
+            variant="outline"
+            className="w-full mt-4 border-border text-foreground hover:bg-secondary bg-transparent"
+          >
+            Edit Profile
+          </Button>
+        </Card>
+
 
         {/* Availability Toggle */}
         <Card className="p-6 mb-8 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
@@ -208,36 +290,7 @@ export default function DonorDashboard() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Profile Card */}
-            <Card className="p-6 bg-card border-border">
-              <div className="text-center mb-4">
-                <Avatar className="h-20 w-20 bg-primary/20 text-primary flex items-center justify-center mx-auto mb-3">
-                  <span className="text-2xl font-semibold">JD</span>
-                </Avatar>
-                <h3 className="font-semibold text-foreground">John Doe</h3>
-                <p className="text-sm text-muted-foreground">Blood Type: O+</p>
-                <Badge className="mt-2 bg-chart-3 text-card">Verified Donor</Badge>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Location:</span>
-                  <span className="text-foreground">San Francisco, CA</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Last Donation:</span>
-                  <span className="text-foreground">45 days ago</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Next Eligible:</span>
-                  <span className="text-foreground">11 days</span>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                className="w-full mt-4 border-border text-foreground hover:bg-secondary bg-transparent"
-              >
-                Edit Profile
-              </Button>
-            </Card>
+
 
             {/* Achievements */}
             <Card className="p-6 bg-card border-border">

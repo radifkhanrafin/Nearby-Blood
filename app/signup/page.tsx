@@ -7,24 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Droplet, Mail, Lock, User, MapPin, Phone } from "lucide-react";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { Droplet, Mail, Lock, User, MapPin, Phone } from "lucide-react";  
 import { signupUser } from "@/lib/firebaseAuth";
+import useAxiosSecure from "@/lib/axios";
 
-interface FormData {
-  name: string;
-  email: string;
-  password: string;
-  phone: string;
-  bloodType: string;
-  location: string;
-}
+
 
 const SignupPage = () => {
   const router = useRouter();
   // const [userType, setUserType] = useState<"donor" | "patient">("donor");
-  const [formData, setFormData] = useState<FormData>({
+
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
@@ -32,11 +25,10 @@ const SignupPage = () => {
     bloodType: "",
     location: "",
     profile: "",
-
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const axiosSecure = useAxiosSecure();
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -58,6 +50,54 @@ const SignupPage = () => {
       // Use reusable signup function
       const user = await signupUser(email, password, name);
       console.log("User created:", user);
+      if (user?.displayName || user?.email) {
+
+ 
+        const emptyUser = {
+          name: user.displayName,
+          email: user.email,
+          phone:  phone,
+          gender: "Male",
+          profile:"https://i.ibb.co.com/PZFYBPKK/1720697818352-removebg-preview.png",
+          dateOfBirth: "1988-02-02T00:00:00.000Z",
+          age: 37,
+          bloodGroup: bloodType,
+          weightKg: 74,
+          lastDonationDate: "2025-03-01T00:00:00.000Z",
+          isDonor: true,
+          availability: "available",
+          medicalHistory: "",
+          emergencyContact: {
+            name: "Farida Begum",
+            relation: "Wife",
+            phone: "01760006666"
+          },
+          presentAddress: {
+            street: "Road 10, House 32",
+            city: "Rajshahi",
+            district: "Rajshahi",
+            postalCode: "6000",
+            country: "Bangladesh"
+          },
+          permanentAddress: {
+            street: "Road 10, House 32",
+            city: "Rajshahi",
+            district: "Rajshahi",
+            postalCode: "6000",
+            country: "Bangladesh"
+          },
+          registrationId: "REG2Nb7M8Q1"
+        };
+
+
+        const res = await axiosSecure.post("/users", emptyUser);
+        console.log("Saved to MongoDB:", res.data);
+
+      } else console.log(false)
+      // 2. Post data to your MongoDB API
+
+
+
 
       // Redirect to login
       router.push("/login");
