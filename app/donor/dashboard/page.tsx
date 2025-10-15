@@ -16,10 +16,10 @@ import Loading from "@/app/patient/dashboard/loading"
 
 export default function DonorDashboard() {
   const [isAvailable, setIsAvailable] = useState(true)
-  // const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
-
+  const [daysLeft, setDaysLeft] = useState();
   const { currentUser, userData, loading } = useCurrentUser();
+
   if (loading) {
     return <Loading />
   }
@@ -54,6 +54,9 @@ export default function DonorDashboard() {
       console.error("Logout failed:", err)
     }
   }
+
+  const nextDonationDate = moment(lastDonationDate).add(90, "days").format("YYYY-MM-DD");
+
 
 
   return (
@@ -134,8 +137,7 @@ export default function DonorDashboard() {
               <img src={profile} alt="Images" />
             </Avatar>
             <h3 className="font-semibold text-foreground text-2xl">{name}</h3>
-            <p className="text-xl text-muted-foreground">Blood Group: {bloodGroup}</p>
-            <p className=" text-muted-foreground">Blood Donation:  6 times</p>
+            <p className="text-xl text-muted-foreground">Blood Group: {bloodGroup}</p> 
             <Badge className="mt-2 bg-chart-3 text-card">Verified Donor</Badge>
           </div>
 
@@ -152,23 +154,24 @@ export default function DonorDashboard() {
               <span className="text-muted-foreground">   Last Donation:  </span>
               <div className="flex flex-col">
                 <span className="text-foreground"> {moment(lastDonationDate).format("MMM Do YY")} </span>
-              <span className="text-foreground">  {moment(lastDonationDate).endOf('day').fromNow() } </span>
+                <span className="text-foreground">  {moment(lastDonationDate).endOf('day').fromNow()} </span>
               </div>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Next Eligible:</span>
-              <span className="text-foreground"></span>
+              <span className="text-foreground">{moment(nextDonationDate).format("MMM Do YY")}</span>
             </div>
           </div>
 
 
-          <Button
+          
+        </Card>
+        <Button
             variant="outline"
-            className="w-full mt-4 border-border text-foreground hover:bg-secondary bg-transparent"
+            className="w-full my-6 border-border text-foreground hover:bg-secondary bg-transparent"
           >
             Edit Profile
           </Button>
-        </Card>
 
 
         {/* Availability Toggle */}
