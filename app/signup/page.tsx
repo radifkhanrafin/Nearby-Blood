@@ -1,65 +1,73 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card } from "@/components/ui/card"
-import { Droplet, Mail, Lock, User, MapPin, Phone } from "lucide-react"
+import { useState, ChangeEvent, FormEvent } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
+import { Droplet, Mail, Lock, User, MapPin, Phone } from "lucide-react";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { signupUser } from "@/lib/firebaseAuth";
 
-export default function SignupPage() {
-  const router = useRouter()
-  const [userType, setUserType] = useState("donor")
-  const [formData, setFormData] = useState({
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  bloodType: string;
+  location: string;
+}
+
+const SignupPage = () => {
+  const router = useRouter();
+  // const [userType, setUserType] = useState<"donor" | "patient">("donor");
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     password: "",
     phone: "",
     bloodType: "",
     location: "",
-  })
-  const [isLoading, setIsLoading] = useState(false)
+    prolife: "",
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    // ✅ Simple validation checks
-    const { name, email, password, phone, bloodType, location } = formData
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    const { name, email, password, phone, bloodType, location } = formData;
 
     if (!name || !email || !password || !phone || !bloodType || !location) {
-      console.log("❌ Please fill in all fields.")
-      return
+      setError("Please fill in all fields.");
+      return;
     }
 
-    // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    //   console.log("❌ Invalid email format.")
-    //   return
-    // }
+    setIsLoading(true);
 
-    // if (password.length < 6) {
-    //   console.log("❌ Password must be at least 6 characters.")
-    //   return
-    // }
+    try {
+      // Use reusable signup function
+      const user = await signupUser(email, password, name);
+      console.log("User created:", user);
 
-    // ✅ Log form data to console
-    console.log("✅ User Type:", userType)
-    console.log("✅ Form Data:", formData)
-
-    // Simulate API call
-    setIsLoading(true)
-    setTimeout(() => {
-      setIsLoading(false)
-      console.log("✅ Account created successfully!")
-      router.push(userType === "donor" ? "/donor/dashboard" : "/patient/dashboard")
-    }, 1500)
-  }
-
+      // Redirect to login
+      router.push("/login");
+    } catch (err: any) {
+      setError(err.message);
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-md">
@@ -74,15 +82,11 @@ export default function SignupPage() {
 
         <Card className="p-8 bg-card border-border">
           {/* User Type Selection */}
-          <div className="flex gap-2 mb-6">
+          {/* <div className="flex gap-2 mb-6">
             <Button
               type="button"
               variant={userType === "donor" ? "default" : "outline"}
-              className={`flex-1 ${
-                userType === "donor"
-                  ? "bg-primary text-primary-foreground"
-                  : "border-border text-foreground"
-              }`}
+              className={`flex-1 ${userType === "donor" ? "bg-primary text-primary-foreground" : "border-border text-foreground"}`}
               onClick={() => setUserType("donor")}
             >
               I'm a Donor
@@ -90,22 +94,19 @@ export default function SignupPage() {
             <Button
               type="button"
               variant={userType === "patient" ? "default" : "outline"}
-              className={`flex-1 ${
-                userType === "patient"
-                  ? "bg-primary text-primary-foreground"
-                  : "border-border text-foreground"
-              }`}
+              className={`flex-1 ${userType === "patient" ? "bg-primary text-primary-foreground" : "border-border text-foreground"}`}
               onClick={() => setUserType("patient")}
             >
               I Need Blood
             </Button>
-          </div>
+          </div> */}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && <p className="text-red-500">{error}</p>}
+
+            {/** Name */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground">
-                Full Name
-              </Label>
+              <Label htmlFor="name" className="text-foreground">Full Name</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -121,10 +122,9 @@ export default function SignupPage() {
               </div>
             </div>
 
+            {/** Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">
-                Email
-              </Label>
+              <Label htmlFor="email" className="text-foreground">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -140,10 +140,9 @@ export default function SignupPage() {
               </div>
             </div>
 
+            {/** Phone */}
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-foreground">
-                Phone Number
-              </Label>
+              <Label htmlFor="phone" className="text-foreground">Phone Number</Label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -159,10 +158,9 @@ export default function SignupPage() {
               </div>
             </div>
 
+            {/** Blood Type */}
             <div className="space-y-2">
-              <Label htmlFor="bloodType" className="text-foreground">
-                Blood Type
-              </Label>
+              <Label htmlFor="bloodType" className="text-foreground">Blood Type</Label>
               <select
                 id="bloodType"
                 name="bloodType"
@@ -183,10 +181,9 @@ export default function SignupPage() {
               </select>
             </div>
 
+            {/** Location */}
             <div className="space-y-2">
-              <Label htmlFor="location" className="text-foreground">
-                Location
-              </Label>
+              <Label htmlFor="location" className="text-foreground">Location</Label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -202,10 +199,9 @@ export default function SignupPage() {
               </div>
             </div>
 
+            {/** Password */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">
-                Password
-              </Label>
+              <Label htmlFor="password" className="text-foreground">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -243,5 +239,7 @@ export default function SignupPage() {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default SignupPage;

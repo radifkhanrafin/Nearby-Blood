@@ -2,34 +2,41 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 import { Droplet, Mail, Lock } from "lucide-react"
 
-export default function LoginPage() {
+import { auth } from "@/lib/firebase" // Import your Firebase auth instance
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { loginUser } from "@/lib/firebaseAuth"
+
+const LoginPage = () => {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-
-  const handleSubmit = async (e) => {
+  const [error, setError] = useState("")
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get("redirect") || "/donor/dashboard";
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const formData = {
-      email,
-      password
-    }
-    console.log("Form Data:", formData)
-    // setIsLoading(true)
+    setIsLoading(true)
+    setError("")
 
-    // // Simulate API call
-    // setTimeout(() => {
-    //   setIsLoading(false)
-    //   // Redirect to donor dashboard (in real app, check user type)
-    //   router.push("/donor/dashboard")
-    // }, 1500)
+    try {
+      // Firebase login
+      const result = await loginUser(email, password)
+      console.log(result.displayName)
+      router.push(redirectPath)
+    } catch (err: any) {
+      console.error("Login error:", err)
+      setError(err.message)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -46,6 +53,10 @@ export default function LoginPage() {
 
         <Card className="p-8 bg-card border-border">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <p className="text-red-500 text-sm text-center">{error}</p>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground">
                 Email
@@ -111,3 +122,5 @@ export default function LoginPage() {
     </div>
   )
 }
+
+export default LoginPage

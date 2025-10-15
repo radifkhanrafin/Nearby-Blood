@@ -2,40 +2,13 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Droplet, MapPin, Award, Bell, Users, Heart, Zap, Shield } from "lucide-react"
+import Header from "@/components/ui/header"
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Droplet className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-foreground">BloodSync</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
-              How It Works
-            </Link>
-            <Link href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
-              About
-            </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" className="text-foreground">
-                Login
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+     <Header/>
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 md:py-32">

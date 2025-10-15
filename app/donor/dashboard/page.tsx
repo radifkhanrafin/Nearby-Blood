@@ -6,10 +6,25 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Droplet, MapPin, Award, Bell, Calendar, Heart, TrendingUp, Users } from "lucide-react"
+import { Droplet, MapPin, Award, Bell, Calendar, Heart, TrendingUp, Users } from "lucide-react" 
+import { getCurrentUser, logoutUser } from "@/lib/firebaseAuth"
 
 export default function DonorDashboard() {
   const [isAvailable, setIsAvailable] = useState(true)
+  // const router = useRouter()
+  const [isOpen, setIsOpen] = useState(false)
+
+
+  console.log(getCurrentUser)
+  const handleLogout = async () => {
+    try {
+      await logoutUser() // call your Firebase signOut
+      // router.push("/login")
+    } catch (err) {
+      console.error("Logout failed:", err)
+    }
+  }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,9 +54,30 @@ export default function DonorDashboard() {
               <Bell className="h-5 w-5 text-foreground" />
               <span className="absolute top-1 right-1 h-2 w-2 bg-primary rounded-full"></span>
             </Button>
-            <Avatar className="h-10 w-10 bg-primary/20 text-primary flex items-center justify-center">
-              <span className="text-sm font-semibold">JD</span>
-            </Avatar>
+            <div
+              className="relative inline-block"
+              onMouseEnter={() => setIsOpen(true)}
+              onMouseLeave={() => setIsOpen(false)}
+            >
+              {/* Profile button */}
+              <button className="h-10 w-10 bg-primary/20 text-primary flex items-center justify-center rounded-full">
+                <span className="text-sm font-semibold"></span>
+              </button>
+
+              {/* Logout menu */}
+              {isOpen && (
+                <div className="absolute right-0 mt-2 w-24 bg-white border border-gray-200 rounded-md shadow-lg">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 hover:bg-red-500 hover:text-white rounded-md"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+
+
           </div>
         </div>
       </header>
