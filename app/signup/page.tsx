@@ -31,7 +31,7 @@ const SignupPage = () => {
     phone: "",
     bloodType: "",
     location: "",
-    prolife: "",
+    profile: "",
 
   });
   const [isLoading, setIsLoading] = useState(false);

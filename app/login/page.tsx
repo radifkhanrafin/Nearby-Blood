@@ -14,6 +14,7 @@ import { signInWithEmailAndPassword } from "firebase/auth"
 import { loginUser } from "@/lib/firebaseAuth"
 
 const LoginPage = () => {
+  
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
