@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/axios.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/axios.js", "components/ui/Footer.jsx", "app/donor/dashboard/page.jsx", "components/ui/Header.jsx", "app/donor-map/page.jsx", "app/login/page.jsx"],
   "exclude": ["node_modules"]
 }

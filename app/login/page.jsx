@@ -22,7 +22,8 @@ const LoginPage = () => {
   const [error, setError] = useState("")
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get("redirect") || "/donor/dashboard";
-  const handleSubmit = async (e: React.FormEvent) => {
+
+  const handleSubmit = async (e ) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
@@ -32,7 +33,7 @@ const LoginPage = () => {
       const result = await loginUser(email, password)
       console.log(result.displayName)
       router.push(redirectPath)
-    } catch (err: any) {
+    } catch (er) {
       console.error("Login error:", err)
       setError(err.message)
     } finally {

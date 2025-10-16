@@ -7,20 +7,21 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Droplet, MapPin, Award, Bell, Calendar, Heart, TrendingUp, Users } from "lucide-react"
-import { logoutUser } from "@/lib/firebaseAuth"
-import useCurrentUser from "../../../lib/useCurrentUser"
-import Loading from "@/app/patient/dashboard/loading"
+import { Droplet, MapPin, Award, Bell, Calendar, Heart, TrendingUp, Users, LogOutIcon } from "lucide-react"
+import { logoutUser } from "@/lib/firebaseAuth" 
+import { Router } from "next/router";
+import Loading from "@/components/ui/loading";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 
 
 export default function DonorDashboard() {
   const [isAvailable, setIsAvailable] = useState(true)
-  const [isOpen, setIsOpen] = useState(false)
+
   const [daysLeft, setDaysLeft] = useState();
   const { currentUser, userData, loading } = useCurrentUser();
 
-  if (loading) {
+  if (!userData || userData == null) {
     return <Loading />
   }
   console.log(" user from dashboard userData", userData)
@@ -61,63 +62,6 @@ export default function DonorDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Droplet className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-foreground">BloodSync</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/donor/dashboard" className="text-foreground font-medium">
-              Dashboard
-            </Link>
-            <Link href="/donor-map" className="text-muted-foreground hover:text-foreground transition-colors">
-              Map
-            </Link>
-            <Link href="/donor/history" className="text-muted-foreground hover:text-foreground transition-colors">
-              History
-            </Link>
-            <Link href="/donor/rewards" className="text-muted-foreground hover:text-foreground transition-colors">
-              Rewards
-            </Link>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5 text-foreground" />
-              <span className="absolute top-1 right-1 h-2 w-2 bg-primary rounded-full"></span>
-            </Button>
-            <div
-              className="relative inline-block"
-              onMouseEnter={() => setIsOpen(true)}
-              onMouseLeave={() => setIsOpen(false)}
-            >
-              {/* Profile button */}
-              <button className="h-10 w-10 bg-primary/20 text-primary flex items-center justify-center rounded-full">
-                <span className="text-sm font-semibold"></span>
-              </button>
-
-              {/* Logout menu */}
-              {isOpen && (
-                <div className="absolute right-0 mt-2 w-24 bg-white border border-gray-200 rounded-md shadow-lg">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-red-500 hover:text-black rounded-md"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-
-
-          </div>
-        </div>
-      </header>
-
-
-
-
 
       <div className="container mx-auto px-4 py-8">
 
@@ -137,7 +81,7 @@ export default function DonorDashboard() {
               <img src={profile} alt="Images" />
             </Avatar>
             <h3 className="font-semibold text-foreground text-2xl">{name}</h3>
-            <p className="text-xl text-muted-foreground">Blood Group: {bloodGroup}</p> 
+            <p className="text-xl text-muted-foreground">Blood Group: {bloodGroup}</p>
             <Badge className="mt-2 bg-chart-3 text-card">Verified Donor</Badge>
           </div>
 
@@ -164,14 +108,14 @@ export default function DonorDashboard() {
           </div>
 
 
-          
+
         </Card>
         <Button
-            variant="outline"
-            className="w-full my-6 border-border text-foreground hover:bg-secondary bg-transparent"
-          >
-            Edit Profile
-          </Button>
+          variant="outline"
+          className="w-full my-6 border-border text-foreground hover:bg-secondary bg-transparent"
+        >
+          Edit Profile
+        </Button>
 
 
         {/* Availability Toggle */}
@@ -339,6 +283,15 @@ export default function DonorDashboard() {
             </Card>
           </div>
         </div>
+
+        <Button
+          variant="outline"
+          onClick={handleLogout}
+          className="w-full my-6 border-border text-foreground hover:bg-secondary bg-transparent"
+        >
+          Logout <LogOutIcon />
+        </Button>
+
       </div>
     </div>
   )

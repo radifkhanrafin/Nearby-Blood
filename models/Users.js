@@ -1,12 +1,11 @@
 import mongoose from "mongoose";
-import { type } from "os";
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   phone: { type: String },
   gender: { type: String },
-  profile:{type:String},
+  profile: { type: String },
   dateOfBirth: { type: Date },
   age: { type: Number },
   bloodGroup: {
@@ -17,13 +16,18 @@ const userSchema = new mongoose.Schema({
   weightKg: { type: Number },
   lastDonationDate: { type: Date },
   isDonor: { type: Boolean, default: false },
-  availability: { type: String, default: "available" },
-  medicalHistory: { type: String },
+  availability: {
+    type: String,
+    enum: ["available", "unavailable", "busy"],
+    default: "available"
+  },
+
+  medicalHistory: { type: String, default: "" },
 
   emergencyContact: {
     name: { type: String },
     relation: { type: String },
-    phone: { type: String },  
+    phone: { type: String },
   },
 
   presentAddress: {

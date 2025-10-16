@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongoose";
-import User from "@/models/User";
+import { connectDB } from "@/lib/mongoose"; 
+import User from "@/models/Users";
 
 // GET user by ID
 export const GET = async (req, { params }) => {

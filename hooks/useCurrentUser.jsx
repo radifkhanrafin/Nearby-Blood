@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from "react";
-import { onAuthUserChanged } from "./firebaseAuth.ts";
-import useAxiosSecure from "./axios.js";
+import { onAuthUserChanged } from "../lib/firebaseAuth.ts";
+import useAxiosSecure from "../lib/axios.js";
 
 const useCurrentUser = () => {
   const [currentUser, setCurrentUser] = useState(null);
