@@ -2,14 +2,14 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Search, Filter, Layers } from "lucide-react"
 import { useDonar } from "@/hooks/useDonar";
 import DonarCard from "../../components/ui/DonarCard";
+import { useUser } from "@/hooks/UserContext"
 
 export default function DonorMapPage() {
 
   const { donars, loading, error } = useDonar();
+  const { userData } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDistricts, setSelectedDistricts] = useState([]);
   const [selectedBloods, setSelectedBloods] = useState([]);
@@ -29,18 +29,23 @@ export default function DonorMapPage() {
     district.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Filter donors dynamically: if no selection, show all
+  // Filter donors dynamically and exclude logged-in user
   const filteredDonors = donars?.filter(donar => {
+    if (!donar) return false;
+
+    // Exclude logged-in user
+    if (userData && donar.registrationId === userData.registrationId) return false;
+
     const matchDistrict = selectedDistricts.length
       ? selectedDistricts.includes(donar?.presentAddress?.district)
       : true;
     const matchBlood = selectedBloods.length
       ? selectedBloods.includes(donar.bloodGroup)
       : true;
+
     return matchDistrict && matchBlood;
   });
 
-  // Toggle selection helper
   const toggleSelection = (value, selectedArray, setSelectedArray) => {
     if (selectedArray.includes(value)) {
       setSelectedArray(selectedArray.filter(v => v !== value));
@@ -60,18 +65,6 @@ export default function DonorMapPage() {
           </div>
 
           <div className="space-y-4 mb-6">
-            {/* Search */}
-            {/* <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search district..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background border-border text-foreground"
-              />
-            </div> */}
-
             {/* Blood Type Filter */}
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">Blood Type</label>
@@ -82,11 +75,11 @@ export default function DonorMapPage() {
                   return (
                     <Button
                       key={type}
-                      variant={isSelected ? "outline" : "default"}
+                      variant="outline"
                       size="sm"
                       onClick={() => toggleSelection(type, selectedBloods, setSelectedBloods)}
                       className={
-                        `border-border  ${isSelected
+                        `border-border ${isSelected
                           ? "bg-primary text-primary-foreground border-primary"
                           : "bg-transparent text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary"
                         }`
@@ -97,7 +90,6 @@ export default function DonorMapPage() {
                   );
                 })}
               </div>
-
             </div>
 
             {/* District Filter */}
@@ -110,7 +102,7 @@ export default function DonorMapPage() {
                   return (
                     <Button
                       key={district}
-                      variant={isSelected ? "outline" : "default"}
+                      variant="outline"
                       size="sm"
                       onClick={() =>
                         toggleSelection(district, selectedDistricts, setSelectedDistricts)
@@ -127,7 +119,6 @@ export default function DonorMapPage() {
                   );
                 })}
               </div>
-
             </div>
 
             {/* Clear Filters */}

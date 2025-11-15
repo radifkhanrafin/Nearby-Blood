@@ -53,57 +53,44 @@ const SignupPage = () => {
       if (user?.displayName || user?.email) {
 
 
-       const emptyUser = {
-  name: user.displayName || "",
-  email: user.email || "",
-  phone: phone || "",
-  gender: "",
-  profile: "https://i.ibb.co.com/PZFYBPKK/1720697818352-removebg-preview.png",
+        const emptyUser = {
+          name: user.displayName || "",
+          email: user.email || "",
+          phone: phone || "",
+          gender: "",
+          profile: "https://i.ibb.co.com/PZFYBPKK/1720697818352-removebg-preview.png",
+          dateOfBirth: null,
+          age: null,
+          bloodGroup: bloodType,
+          weightKg: null,
+          lastDonationDate: null,
+          isDonor: true,
+          availability: "unavailable",
+          medicalHistory: "",
+          bloodRequest: [],
+          emergencyContact: {
+            name: "",
+            relation: "",
+            phone: ""
+          },
 
-  // ❌ " " is invalid for Date → must be null
-  dateOfBirth: null,
-  age: null,
+          presentAddress: {
+            street: "",
+            city: "",
+            district: "",
+            postalCode: "",
+            country: ""
+          },
 
-  bloodGroup: bloodType, // must be: A+, A-, B+, B-, AB+, AB-, O+, O-
-
-  weightKg: null,
-
-  // ❌ " " is invalid → must be null
-  lastDonationDate: null,
-
-  isDonor: true,
-
-  // ❌ empty string is not allowed in enum ["available", "unavailable"]
-  availability: "available",
-
-  medicalHistory: "",
-  bloodRequest: [],
-
-  emergencyContact: {
-    name: "",
-    relation: "",
-    phone: ""
-  },
-
-  presentAddress: {
-    street: "",
-    city: "",
-    district: "",
-    postalCode: "",
-    country: ""
-  },
-
-  permanentAddress: {
-    street: "",
-    city: "",
-    district: "",
-    postalCode: "",
-    country: ""
-  },
-
-  // ❌ cannot send "" because unique index will break
-  registrationId: `REG-${Date.now()}`
-};
+          permanentAddress: {
+            street: "",
+            city: "",
+            district: "",
+            postalCode: "",
+            country: ""
+          }, 
+          registrationId: `REG-${Date.now()}`
+        };
 
 
 

@@ -11,9 +11,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState } from "react"; 
+import useAxiosSecure from "@/lib/axios";
+import { useUser } from "@/hooks/UserContext";
 
 const DonarCard = ({ donar }) => {
+
+  const {userData}=useUser();
   const {
     name,
     email,
@@ -39,30 +43,23 @@ const DonarCard = ({ donar }) => {
   const [location, setLocation] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [message, setMessage] = useState("");
-
-  const handleSendRequest = () => {
-    const requestData = {
-      donorName: name,
-      donorEmail: email,
-      patientProblem,
-      needDate,
-      needTime,
-      location,
-      contactNumber,
-      message
-    };
-
-    console.log("Request data:", requestData);
-    alert("Request sent successfully!");
-
-    // Reset fields
-    setPatientProblem("");
-    setNeedDate("");
-    setNeedTime("");
-    setLocation("");
-    setContactNumber("");
-    setMessage("");
+ const axiosSecure = useAxiosSecure();
+ const handleSendRequest = () => {
+  const newRequest = {
+    donar,
+    patientProblem,
+    needDate,
+    needTime,
+    location,
+    contactNumber,
+    message,
+    requestStatus: "pending"
   };
+
+  const result = axiosSecure.patch(`/users/id/${userData._id}`, { newRequest });
+  console.log("Request sent:", newRequest, result);
+};
+
 
   return (
     <Card

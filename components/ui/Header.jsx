@@ -47,14 +47,14 @@ const Header = () => {
           >
             Request For Blood
           </Link>
-          {
+          {/* {
             !userData && <Link href="/become-donor" className="text-muted-foreground hover:text-primary transition-colors">
               Become a Donor
             </Link>
-          }
-          <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
+          } */}
+          {/* <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
             Contact
-          </Link>
+          </Link> */}
         </nav>
 
         {/* Right Side Icons */}
