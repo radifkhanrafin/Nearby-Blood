@@ -1,6 +1,17 @@
-import { Badge, Droplet, Mail, MapPin, Phone, User, Heart, Clipboard, Calendar, Users } from "lucide-react";
+import { Badge, Droplet, Mail, MapPin, Phone, User, Heart, Clipboard, Calendar } from "lucide-react";
 import { Card } from "../ui/card";
 import moment from "moment";
+import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 
 const DonarCard = ({ donar }) => {
   const {
@@ -14,21 +25,51 @@ const DonarCard = ({ donar }) => {
     bloodGroup,
     weightKg,
     lastDonationDate,
-    isDonor,
     availability,
     medicalHistory,
     registrationId,
     emergencyContact,
     presentAddress,
-    permanentAddress,
   } = donar;
+
+  // Modal input states
+  const [patientProblem, setPatientProblem] = useState("");
+  const [needDate, setNeedDate] = useState("");
+  const [needTime, setNeedTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSendRequest = () => {
+    const requestData = {
+      donorName: name,
+      donorEmail: email,
+      patientProblem,
+      needDate,
+      needTime,
+      location,
+      contactNumber,
+      message
+    };
+
+    console.log("Request data:", requestData);
+    alert("Request sent successfully!");
+
+    // Reset fields
+    setPatientProblem("");
+    setNeedDate("");
+    setNeedTime("");
+    setLocation("");
+    setContactNumber("");
+    setMessage("");
+  };
 
   return (
     <Card
       key={registrationId}
       className="flex flex-col w-full gap-4 p-4 bg-background border border-border rounded-2xl hover:shadow-md hover:border-primary/50 transition-all"
     >
-      {/* Top section: profile + name + availability */}
+      {/* Top section */}
       <div className="flex items-center gap-4">
         <div className="w-20 h-20 rounded-full overflow-hidden border border-primary/20">
           <img
@@ -47,9 +88,6 @@ const DonarCard = ({ donar }) => {
             ) : (
               <Badge className="bg-gray-400 text-white text-xs">Unavailable</Badge>
             )}
-            {/* {isDonor && (
-              <Badge className="bg-red-500 text-white text-xs">Donor</Badge>
-            )} */}
           </div>
         </div>
       </div>
@@ -73,46 +111,118 @@ const DonarCard = ({ donar }) => {
         </div>
         {lastDonationDate && (
           <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" /> Last Donation: {moment(lastDonationDate).format("MMM Do YY")}
+            <Calendar className="w-4 h-4" /> Last Donation:{" "}
+            {moment(lastDonationDate).format("MMM Do YY")}
           </div>
         )}
       </div>
 
-      {/* Addresses */}
+      {/* Address */}
       <div className="text-sm text-muted-foreground">
         <div className="flex items-start gap-1">
           <MapPin className="w-4 h-4 mt-1" />
           <div>
-            <strong>Present Address:</strong> {presentAddress?.street}, {presentAddress?.city}, {presentAddress?.district}, {presentAddress?.postalCode}, {presentAddress?.country}
+            <strong>Present Address:</strong> {presentAddress?.street},{" "}
+            {presentAddress?.city}, {presentAddress?.district},{" "}
+            {presentAddress?.postalCode}, {presentAddress?.country}
           </div>
         </div>
-        {/* <div className="flex items-start gap-1 mt-1">
-          <MapPin className="w-4 h-4 mt-1" />
-          <div>
-            <strong>Permanent Address:</strong> {permanentAddress?.street}, {permanentAddress?.city}, {permanentAddress?.district}, {permanentAddress?.postalCode}, {permanentAddress?.country}
-          </div>
-        </div> */}
       </div>
-
-      {/* Medical History */}
-      {medicalHistory && (
-        <div className="text-sm text-muted-foreground">
-          <strong>Medical History:</strong> {medicalHistory}
-        </div>
-      )}
 
       {/* Emergency Contact */}
       {emergencyContact && (
         <div className="text-sm text-muted-foreground">
-          <strong>Emergency Contact:</strong> {emergencyContact.name} ({emergencyContact.relation}) - {emergencyContact.phone}
+          <strong>Emergency Contact:</strong> {emergencyContact.name} (
+          {emergencyContact.relation}) - {emergencyContact.phone}
         </div>
       )}
 
-      {/* Blood Group Badge */}
-      <div className="flex items-center justify-end mt-2">
-        <Badge variant="outline" className="border-primary text-primary text-lg px-3 py-1 flex items-center gap-1">
+      {/* Blood Group Badge + Send Request Button */}
+      <div className="flex items-center justify-between mt-2">
+        <Badge
+          variant="outline"
+          className="border-primary text-primary text-lg px-3 py-1 flex items-center gap-1"
+        >
           <Droplet className="w-4 h-4" /> {bloodGroup}
         </Badge>
+
+        {/* Send Request Modal */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="bg-primary text-white hover:bg-primary/90">
+              Send Request
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Send a Request to {name}</DialogTitle>
+            </DialogHeader>
+
+            <div className="flex flex-col gap-3">
+
+              <input
+                type="text"
+                placeholder="Patient problem (রুগীর সমস্যা)"
+                className="border p-2 rounded-md"
+                value={patientProblem}
+                onChange={(e) => setPatientProblem(e.target.value)}
+              />
+
+              <div className="flex flex-col">
+                <label className="text-sm text-muted-foreground">Date needed (তারিখ)</label>
+                <input
+                  type="date"
+                  className="border p-2 rounded-md"
+                  value={needDate}
+                  onChange={(e) => setNeedDate(e.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-sm text-muted-foreground">Time needed (সময়)</label>
+                <input
+                  type="time"
+                  className="border p-2 rounded-md"
+                  value={needTime}
+                  onChange={(e) => setNeedTime(e.target.value)}
+                />
+              </div>
+
+              <input
+                type="text"
+                placeholder="Hospital / Location (হাসপাতাল/লোকেশন)"
+                className="border p-2 rounded-md"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+
+              <input
+                type="text"
+                placeholder="Patient / Relative Phone Number"
+                className="border p-2 rounded-md"
+                value={contactNumber}
+                onChange={(e) => setContactNumber(e.target.value)}
+              />
+
+              <Textarea
+                placeholder="Write your message here..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+
+            </div>
+
+            <DialogFooter>
+              <Button
+                onClick={handleSendRequest}
+                className="bg-primary text-white hover:bg-primary/90"
+              >
+                Send Request
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </Card>
   );

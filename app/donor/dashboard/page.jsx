@@ -9,17 +9,16 @@ import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Droplet, MapPin, Award, Bell, Calendar, Heart, TrendingUp, Users, LogOutIcon } from "lucide-react"
 import { logoutUser } from "@/lib/firebaseAuth" 
-import { Router } from "next/router";
-import Loading from "@/components/ui/loading";
-import useCurrentUser from "@/hooks/useCurrentUser";
+import { useRouter } from "next/navigation"
+import Loading from "@/components/ui/loading"; 
+import { useUser } from "@/hooks/UserContext";
 
 
 
 export default function DonorDashboard() {
   const [isAvailable, setIsAvailable] = useState(true)
-
-  const [daysLeft, setDaysLeft] = useState();
-  const { currentUser, userData, loading } = useCurrentUser();
+ const router = useRouter()
+const { userData, loading } = useUser();
 
   if (!userData || userData == null) {
     return <Loading />
@@ -50,7 +49,7 @@ export default function DonorDashboard() {
   const handleLogout = async () => {
     try {
       await logoutUser()
-      // Router.push("/login")
+      router.push("/")
     } catch (err) {
       console.error("Logout failed:", err)
     }

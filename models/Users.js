@@ -18,10 +18,10 @@ const userSchema = new mongoose.Schema({
   isDonor: { type: Boolean, default: false },
   availability: {
     type: String,
-    enum: ["available", "unavailable", "busy"],
+    enum: ["available", "unavailable"],
     default: "available"
   },
-
+  bloodRequest: [],
   medicalHistory: { type: String, default: "" },
 
   emergencyContact: {

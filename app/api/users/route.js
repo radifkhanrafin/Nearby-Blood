@@ -17,13 +17,13 @@ export const GET = async () => {
 
 // POST new user
 export const POST = async (req) => {
-  console.log("api hit")
+  // console.log("api hit")
   try {
     await connectDB();
     const body = await req.json();
-     console.log('body',body)
+    //  console.log('body',body)
     const newUser = await User.create(body);
-    console.log("newUser",newUser)
+    // console.log("newUser",newUser)
     return NextResponse.json(newUser, { status: 201 });
   } catch (err) {
     return NextResponse.json({ error: "Failed to create user" , err }, { status: 500 });

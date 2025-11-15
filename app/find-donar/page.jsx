@@ -11,8 +11,8 @@ export default function DonorMapPage() {
 
   const { donars, loading, error } = useDonar();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDistricts, setSelectedDistricts] = useState([]); // start empty
-  const [selectedBloods, setSelectedBloods] = useState([]);       // start empty
+  const [selectedDistricts, setSelectedDistricts] = useState([]);
+  const [selectedBloods, setSelectedBloods] = useState([]);
 
   const bangladeshDistricts = [
     "Bagerhat", "Bandarban", "Barguna", "Barisal", "Bhola", "Bogra", "Brahmanbaria", "Chandpur", "Chattogram", "Chuadanga",
@@ -61,7 +61,7 @@ export default function DonorMapPage() {
 
           <div className="space-y-4 mb-6">
             {/* Search */}
-            <div className="relative">
+            {/* <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="text"
@@ -70,42 +70,64 @@ export default function DonorMapPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-background border-border text-foreground"
               />
-            </div>
+            </div> */}
 
             {/* Blood Type Filter */}
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">Blood Type</label>
               <div className="flex flex-wrap gap-2">
-                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((type) => (
-                  <Button
-                    key={type}
-                    variant={selectedBloods.includes(type) ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => toggleSelection(type, selectedBloods, setSelectedBloods)}
-                    className="border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary bg-transparent"
-                  >
-                    {type}
-                  </Button>
-                ))}
+                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((type) => {
+                  const isSelected = selectedBloods.includes(type);
+
+                  return (
+                    <Button
+                      key={type}
+                      variant={isSelected ? "outline" : "default"}
+                      size="sm"
+                      onClick={() => toggleSelection(type, selectedBloods, setSelectedBloods)}
+                      className={
+                        `border-border  ${isSelected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-transparent text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                        }`
+                      }
+                    >
+                      {type}
+                    </Button>
+                  );
+                })}
               </div>
+
             </div>
 
             {/* District Filter */}
             <div>
               <h3 className="my-2">Search by Districts</h3>
               <div className="flex flex-wrap gap-2">
-                {filteredDistricts.map((district) => (
-                  <Button
-                    key={district}
-                    variant={selectedDistricts.includes(district) ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => toggleSelection(district, selectedDistricts, setSelectedDistricts)}
-                    className="border-border text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary bg-transparent"
-                  >
-                    {district}
-                  </Button>
-                ))}
+                {filteredDistricts.map((district) => {
+                  const isSelected = selectedDistricts.includes(district);
+
+                  return (
+                    <Button
+                      key={district}
+                      variant={isSelected ? "outline" : "default"}
+                      size="sm"
+                      onClick={() =>
+                        toggleSelection(district, selectedDistricts, setSelectedDistricts)
+                      }
+                      className={
+                        `border-border ${isSelected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-transparent text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                        }`
+                      }
+                    >
+                      {district}
+                    </Button>
+                  );
+                })}
               </div>
+
             </div>
 
             {/* Clear Filters */}

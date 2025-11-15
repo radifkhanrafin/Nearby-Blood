@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Droplet, Mail, Lock, User, MapPin, Phone } from "lucide-react";  
+import { Droplet, Mail, Lock, User, MapPin, Phone } from "lucide-react";
 import { signupUser } from "@/lib/firebaseAuth";
 import useAxiosSecure from "@/lib/axios";
 
@@ -52,42 +52,59 @@ const SignupPage = () => {
       console.log("User created:", user);
       if (user?.displayName || user?.email) {
 
- 
-        const emptyUser = {
-          name: user.displayName,
-          email: user.email,
-          phone:  phone,
-          gender: "Male",
-          profile:"https://i.ibb.co.com/PZFYBPKK/1720697818352-removebg-preview.png",
-          dateOfBirth: "1988-02-02T00:00:00.000Z",
-          age: 37,
-          bloodGroup: bloodType,
-          weightKg: 74,
-          lastDonationDate: "2025-03-01T00:00:00.000Z",
-          isDonor: true,
-          availability: "available",
-          medicalHistory: "",
-          emergencyContact: {
-            name: "Farida Begum",
-            relation: "Wife",
-            phone: "01760006666"
-          },
-          presentAddress: {
-            street: "Road 10, House 32",
-            city: "Rajshahi",
-            district: "Rajshahi",
-            postalCode: "6000",
-            country: "Bangladesh"
-          },
-          permanentAddress: {
-            street: "Road 10, House 32",
-            city: "Rajshahi",
-            district: "Rajshahi",
-            postalCode: "6000",
-            country: "Bangladesh"
-          },
-          registrationId: "REG2Nb7M8Q1"
-        };
+
+       const emptyUser = {
+  name: user.displayName || "",
+  email: user.email || "",
+  phone: phone || "",
+  gender: "",
+  profile: "https://i.ibb.co.com/PZFYBPKK/1720697818352-removebg-preview.png",
+
+  // ❌ " " is invalid for Date → must be null
+  dateOfBirth: null,
+  age: null,
+
+  bloodGroup: bloodType, // must be: A+, A-, B+, B-, AB+, AB-, O+, O-
+
+  weightKg: null,
+
+  // ❌ " " is invalid → must be null
+  lastDonationDate: null,
+
+  isDonor: true,
+
+  // ❌ empty string is not allowed in enum ["available", "unavailable"]
+  availability: "available",
+
+  medicalHistory: "",
+  bloodRequest: [],
+
+  emergencyContact: {
+    name: "",
+    relation: "",
+    phone: ""
+  },
+
+  presentAddress: {
+    street: "",
+    city: "",
+    district: "",
+    postalCode: "",
+    country: ""
+  },
+
+  permanentAddress: {
+    street: "",
+    city: "",
+    district: "",
+    postalCode: "",
+    country: ""
+  },
+
+  // ❌ cannot send "" because unique index will break
+  registrationId: `REG-${Date.now()}`
+};
+
 
 
         const res = await axiosSecure.post("/users", emptyUser);

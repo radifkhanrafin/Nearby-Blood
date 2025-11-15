@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState, useEffect } from "react";
 import { onAuthUserChanged } from "../lib/firebaseAuth.ts";
@@ -6,8 +6,8 @@ import useAxiosSecure from "../lib/axios.js";
 
 const useCurrentUser = () => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [userData, setUserData] = useState(null); // MongoDB data
-  const [loading, setLoading] = useState(true); // loading state
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const axiosSecure = useAxiosSecure();
 
@@ -26,7 +26,8 @@ const useCurrentUser = () => {
         } finally {
           setLoading(false);
         }
-      } else {
+      } else { //
+        setUserData(null);      
         setLoading(false);
       }
     });

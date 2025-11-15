@@ -5,13 +5,14 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Droplet, Bell } from "lucide-react" 
-import useCurrentUser from "@/hooks/useCurrentUser"
+import { useUser } from "@/hooks/UserContext"
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const router = useRouter()
-  const { userData } = useCurrentUser()
-  console.log(userData)
+  const router = useRouter() 
+  const { userData, loading } = useUser();
+
+  // console.log("userData from header",userData)
   // Profile click handler
   const goToDashboard = () => {
     router.push("/donor/dashboard")
@@ -34,17 +35,23 @@ const Header = () => {
           <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">
             About
           </Link>
-          <Link href="/donate-blood" className="text-muted-foreground hover:text-primary transition-colors">
+          {/* <Link href="/donate-blood" className="text-muted-foreground hover:text-primary transition-colors">
             Donate Blood
-          </Link>
-          <Link href="/donor-map" className="text-muted-foreground hover:text-primary transition-colors">
+          </Link> */}
+          <Link href="/find-donar" className="text-muted-foreground hover:text-primary transition-colors">
             Find Donor
           </Link>
-         {
-          !userData &&  <Link href="/become-donor" className="text-muted-foreground hover:text-primary transition-colors">
-            Become a Donor
+          <Link
+            href={userData ? "/request-blood" : "/login"}
+            className="text-muted-foreground hover:text-primary transition-colors"
+          >
+            Request For Blood
           </Link>
-         }
+          {
+            !userData && <Link href="/become-donor" className="text-muted-foreground hover:text-primary transition-colors">
+              Become a Donor
+            </Link>
+          }
           <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
             Contact
           </Link>
@@ -67,11 +74,11 @@ const Header = () => {
                 onClick={goToDashboard}
                 className="h-10 w-10 bg-primary/20 text-primary flex items-center justify-center rounded-full"
               >
-                 <img className="h-12 w-16 object-cover rounded-full" src={userData?.profile} alt="profile" />
+                <img className="h-12 w-16 object-cover rounded-full" src={userData?.profile} alt="profile" />
               </button>
             }
 
-            
+
           </div>
         </div>
       </div>
