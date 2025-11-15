@@ -33,10 +33,11 @@ const LoginPage = () => {
       const result = await loginUser(email, password)
       console.log(result.displayName)
       router.push(redirectPath)
-    } catch (er) {
-      console.error("Login error:", err)
-      setError(err.message)
-    } finally {
+    } catch (err) {
+  console.error("Login error:", err)
+  setError(err.message)
+}
+ finally {
       setIsLoading(false)
     }
   }
