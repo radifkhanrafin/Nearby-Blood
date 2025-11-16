@@ -3,15 +3,14 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useDonar } from "@/hooks/useDonar";
-import DonarCard from "../../components/ui/DonarCard";
-import { useUser } from "@/hooks/UserContext"
+import DonarCard from "../../components/DonarCard"; 
 import { useBloodRequest } from "@/hooks/useBloodRequest";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 export default function DonorMapPage() {
 
-  const { donars, loading, refetch } = useDonar();
-  const { bloodRequest } = useBloodRequest();
-  const { userData } = useUser();
+  const { donars, loading, refetch } = useDonar(); 
+const { userData, loadingUser,refetchUser } = useCurrentUser()
 
 
   const [searchQuery, setSearchQuery] = useState("");

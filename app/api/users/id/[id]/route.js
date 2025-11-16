@@ -14,35 +14,57 @@ export const GET = async (req, { params }) => {
     return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
   }
 };
-
-
 export const PATCH = async (req, { params }) => {
   try {
     await connectDB();
     const { id } = params;
-console.log(id)
+
+    console.log("User ID:", id);
+
     const user = await User.findById(id);
+
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
     }
 
-    // Get new request data from request body
-    const { newRequest } = await req.json();
-    console.log(newRequest)
-    if (!newRequest) {
-      return NextResponse.json({ error: "No request data provided" }, { status: 400 });
+    // Get data sent from frontend
+    const body = await req.json();
+    console.log("PATCH payload:", body);
+
+    // --- 1. Update Availability ---
+    if (body.hasOwnProperty("availability")) {
+      user.availability = body.availability;
     }
 
-    // Push the new request into the bloodRequest array
-    user.bloodRequest.push(newRequest);
+    // --- 2. Add new blood request (push into array) ---
+    if (body.newRequest) {
+      user.bloodRequest.push(body.newRequest);
+    }
 
-    // Save the updated user
+    // --- 3. Update other fields dynamically (optional) ---
+    // Example: name, phone, role, etc.
+    for (const key in body) {
+      if (key !== "newRequest" && key !== "availability") {
+        user[key] = body[key];
+      }
+    }
+
+    // Save the modified user
     await user.save();
 
-    return NextResponse.json({ message: "Blood request added successfully", user }, { status: 200 });
+    return NextResponse.json(
+      { message: "User updated successfully", user },
+      { status: 200 }
+    );
 
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update user" },
+      { status: 500 }
+    );
   }
 };

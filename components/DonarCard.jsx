@@ -1,7 +1,7 @@
 import { Badge, Droplet, Mail, MapPin, Phone, User, Heart, Clipboard, Calendar } from "lucide-react";
-import { Card } from "../ui/card";
+import { Card } from "./ui/card";
 import moment from "moment";
-import { Button } from "../ui/button";
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,14 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
-import useAxiosSecure from "@/lib/axios";
-import { useUser } from "@/hooks/UserContext";
+import useAxiosSecure from "@/lib/axios"; 
 import { toast } from "react-toastify";
 import { useBloodRequest } from "@/hooks/useBloodRequest";
 
 const DonarCard = ({ donar, refetch, requestSent }) => {
 
-  const { userData } = useUser();
+  const { userData, loadingUser,refetchUser } = useCurrentUser()
 
   const {
     name,

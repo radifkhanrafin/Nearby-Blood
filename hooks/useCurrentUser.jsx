@@ -1,41 +1,52 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { onAuthUserChanged } from "../lib/firebaseAuth.ts";
 import useAxiosSecure from "../lib/axios.js";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const useCurrentUser = () => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // 🔥 Listen to Firebase auth changes
   useEffect(() => {
-    const unsubscribe = onAuthUserChanged(async (user) => {
+    const unsubscribe = onAuthUserChanged((user) => {
       setCurrentUser(user);
 
-      if (user?.email) {
-        setLoading(true);
-        try {
-          const res = await axiosSecure.get(`/users/email/${user.email}`);
-          setUserData(res.data);
-        } catch (err) {
-          console.error("Failed to fetch user:", err);
-          setError(err);
-        } finally {
-          setLoading(false);
-        }
-      } else { //
-        setUserData(null);      
-        setLoading(false);
-      }
+      // Auto-refetch when auth state changes
+      queryClient.invalidateQueries(["currentUserData"]);
     });
 
     return () => unsubscribe();
   }, []);
 
-  return { currentUser, userData, loading, error };
+  // 🔥 Fetch user info using React Query
+  const {
+    data: userData,
+    error,
+    isLoading,
+    isFetching,
+    refetch, // ⭐ REFETCH ADDED HERE
+  } = useQuery({
+    queryKey: ["currentUserData", currentUser?.email],
+    enabled: !!currentUser?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/users/email/${currentUser.email}`);
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return {
+    currentUser,
+    userData,
+    loadingUser: isLoading || isFetching,
+    error,
+    refetchUser:refetch,  
+  };
 };
 
 export default useCurrentUser;

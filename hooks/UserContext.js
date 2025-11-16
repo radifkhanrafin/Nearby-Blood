@@ -1,12 +1,11 @@
 'use client'
 
 import { createContext, useContext } from "react";
-import useCurrentUser from "@/hooks/useCurrentUser";   // ✅ FIXED PATH
-
+import useCurrentUser from "@/hooks/useCurrentUser";   
 const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
-  const userState = useCurrentUser();  // shared global state
+  const userState = useCurrentUser();   
   return (
     <UserContext.Provider value={userState}>
       {children}

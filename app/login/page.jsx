@@ -28,7 +28,7 @@ const LoginPage = () => {
     try {
       const result = await loginUser(email, password)
       console.log(result.displayName)
-      router.push("/donar/dashboard")
+      router.push("donor/dashboard")
     } catch (err) {
       console.error("Login error:", err)
       setError(err.message)

@@ -17,9 +17,8 @@ const userSchema = new mongoose.Schema({
   lastDonationDate: { type: Date },
   isDonor: { type: Boolean, default: false },
   availability: {
-    type: String,
-    enum: ["available", "unavailable"],
-    default: "available"
+    type: Boolean, 
+    default: true
   },
   bloodRequest: [],
   medicalHistory: { type: String, default: "" },

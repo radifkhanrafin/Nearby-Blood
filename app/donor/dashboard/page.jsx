@@ -11,26 +11,26 @@ import {
 } from "lucide-react"
 import { logoutUser } from "@/lib/firebaseAuth"
 import { useRouter } from "next/navigation"
-import Loading from "@/components/ui/loading"
-import { useUser } from "@/hooks/UserContext"
+import Loading from "@/components/ui/loading" 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import RecentBloodRequests from "@/components/ui/bloodRequestList";
-import MyBloodRequestList from "@/components/ui/myBloodRequestList";
+import RecentBloodRequests from "@/components/bloodRequestList";
+import MyBloodRequestList from "@/components/myBloodRequestList";
 import { useBloodRequest } from "@/hooks/useBloodRequest";
 import { toast } from "react-toastify"
-
+import { statsData } from "../../fakeData/index";
+import useAxiosSecure from "@/lib/axios"
+import useCurrentUser from "@/hooks/useCurrentUser"
 
 export default function DonorDashboard() {
-  const [isAvailable, setIsAvailable] = useState(true)
+ 
   const [showProfileModal, setShowProfileModal] = useState(false)
   const router = useRouter()
-  const { userData, loading } = useUser()
+  const { userData, loadingUser,refetchUser } = useCurrentUser()
   const { bloodRequest, error, refetch } = useBloodRequest();
-  // console.log(bloodRequest)
-
+ const [isAvailable, setIsAvailable] = useState(userData?.availability)
   const [myRequest, setMyRequest] = useState([]);
   const [requestForBlood, setRequestForBlood] = useState([]);
-
+  const axiosSecure = useAxiosSecure();
   useEffect(() => {
     if (bloodRequest && userData) {
       setRequestForBlood(
@@ -103,14 +103,32 @@ export default function DonorDashboard() {
       // console.error("Logout failed:", err)
     }
   }
+console.log("userData.availability",userData)
 
-  if (loading || !userData) return <Loading />
+  const actionToAbility = async (id, availability) => {
+    console.log(id)
+    console.log(availability)
+
+    const res = await axiosSecure.patch(`users/id/${id}`, {
+      availability: availability
+    })
+
+    console.log(res)
+
+    if (res.status == 200) {
+      setIsAvailable(!isAvailable)
+      refetchUser()
+      toast("Update Ability")
+    }
+
+  }
+  if (loadingUser  ) return <Loading />
 
   return (
     <div className="min-h-screen bg-background relative">
       {/* Overlay if profile incomplete */}
       {profileIncomplete && (
-        <div className="absolute inset-0 bg-black/30 z-50 flex items-center justify-center"></div>
+        <div className="absolute inset-0 bg-black/30 z-40 flex items-center justify-center pointer-events-none"></div>
       )}
 
       <div className="container mx-auto px-4 py-8 pointer-events-auto">
@@ -172,7 +190,7 @@ export default function DonorDashboard() {
         </Button>
 
         {/* Availability Toggle */}
-        <Card className="p-6 mb-8 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+        <Card className="p-6 mb-8 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20  ">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-semibold text-foreground mb-1">Donation Availability</h3>
@@ -182,57 +200,30 @@ export default function DonorDashboard() {
                   : "You are currently unavailable"}
               </p>
             </div>
-            <Button
-              onClick={() => setIsAvailable(!isAvailable)}
+               <Button
+              onClick={() => actionToAbility(userData._id, !isAvailable)}
               className={`${isAvailable ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}
             >
               {isAvailable ? "Available" : "Unavailable"}
             </Button>
+
           </div>
         </Card>
 
         {/* Stats Grid */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Droplet className="h-6 w-6 text-primary" />
+        <div className="grid mask-conic-1 md:grid-cols-4 gap-6 mb-8">
+          {statsData.map((Data, index) => (
+            <Card key={index} className="p-6 bg-card border-border flex items-center justify-center">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`h-12 w-12 rounded-lg ${Data.bg} flex items-center justify-center`}>
+                  {Data.icon && <Data.icon />}  {/* Render component correctly */}
+                </div>
+                {Data.extraIcon && <Data.extraIcon />}  {/* Render component correctly */}
               </div>
-              <TrendingUp className="h-5 w-5 text-chart-3" />
-            </div>
-            <div className="text-3xl font-bold text-foreground mb-1">12</div>
-            <div className="text-sm text-muted-foreground">Total Donations</div>
-          </Card>
-
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                <Heart className="h-6 w-6 text-accent" />
-              </div>
-            </div>
-            <div className="text-3xl font-bold text-foreground mb-1">36</div>
-            <div className="text-sm text-muted-foreground">Lives Impacted</div>
-          </Card>
-
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-12 w-12 rounded-lg bg-chart-4/10 flex items-center justify-center">
-                <Award className="h-6 w-6 text-chart-4" />
-              </div>
-            </div>
-            <div className="text-3xl font-bold text-foreground mb-1">2,450</div>
-            <div className="text-sm text-muted-foreground">Reward Points</div>
-          </Card>
-
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center justify-between mb-4">
-              <div className="h-12 w-12 rounded-lg bg-chart-3/10 flex items-center justify-center">
-                <Users className="h-6 w-6 text-chart-3" />
-              </div>
-            </div>
-            <div className="text-3xl font-bold text-foreground mb-1">#24</div>
-            <div className="text-sm text-muted-foreground">Leaderboard Rank</div>
-          </Card>
+              <div className="text-3xl font-bold text-foreground mb-1">{Data.value}</div>
+              <div className="text-sm text-muted-foreground">{Data.label}</div>
+            </Card>
+          ))}
         </div>
 
 
@@ -278,22 +269,7 @@ export default function DonorDashboard() {
             </Card> */}
 
           {/* Next Appointment */}
-          {/* <Card className="p-6 bg-card border-border">
-              <h3 className="font-semibold text-foreground mb-4">Upcoming Appointment</h3>
-              <div className="flex items-center gap-3 mb-4">
-                <Calendar className="h-5 w-5 text-primary" />
-                <div>
-                  <div className="text-sm font-medium text-foreground">Blood Drive Event</div>
-                  <div className="text-xs text-muted-foreground">March 25, 2025 at 10:00 AM</div>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                className="w-full border-border text-foreground hover:bg-secondary bg-transparent"
-              >
-                View Details
-              </Button>
-            </Card> */}
+
           {/* </div> */}
         </div>
 
@@ -301,7 +277,7 @@ export default function DonorDashboard() {
 
         {/* Logout */}
         <Button
-        
+
           variant="outline"
           onClick={handleLogout}
           className="w-full my-6 border-border text-foreground hover:bg-secondary bg-transparent cursor-pointer hover:border-white"
