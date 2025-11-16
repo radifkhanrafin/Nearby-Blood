@@ -11,13 +11,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react"; 
+import { useState } from "react";
 import useAxiosSecure from "@/lib/axios";
 import { useUser } from "@/hooks/UserContext";
 
 const DonarCard = ({ donar }) => {
 
-  const {userData}=useUser();
+  const { userData } = useUser();
   const {
     name,
     email,
@@ -43,22 +43,26 @@ const DonarCard = ({ donar }) => {
   const [location, setLocation] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [message, setMessage] = useState("");
- const axiosSecure = useAxiosSecure();
- const handleSendRequest = () => {
-  const newRequest = {
-    donar,
-    patientProblem,
-    needDate,
-    needTime,
-    location,
-    contactNumber,
-    message,
-    requestStatus: "pending"
-  };
+  const axiosSecure = useAxiosSecure();
+  const handleSendRequest = () => {
+    const newRequest = {
+      requestReceiver: donar,
+      patientProblem,
+      needDate,
+      needTime,
+      location,
+      contactNumber,
+      message,
+      requestStatus: "pending",
+      requestSender: userData
 
-  const result = axiosSecure.patch(`/users/id/${userData._id}`, { newRequest });
-  console.log("Request sent:", newRequest, result);
-};
+    };
+
+
+    const result = axiosSecure.post('/blood' , { newRequest });
+
+     
+  };
 
 
   return (

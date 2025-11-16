@@ -21,8 +21,9 @@ import { useRouter } from "next/navigation"
 import Loading from "@/components/ui/loading"
 import { useUser } from "@/hooks/UserContext"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import  RecentBloodRequests  from "@/components/ui/bloodRequestList";
-
+import RecentBloodRequests from "@/components/ui/bloodRequestList";
+import MyBloodRequestList from "@/components/ui/myBloodRequestList";
+import { useBloodRequest } from "@/hooks/useBloodRequest";
 
 
 export default function DonorDashboard() {
@@ -30,7 +31,34 @@ export default function DonorDashboard() {
   const [showProfileModal, setShowProfileModal] = useState(false)
   const router = useRouter()
   const { userData, loading } = useUser()
-  
+  const { bloodRequest, error, refetch } = useBloodRequest();
+  // console.log(bloodRequest)
+
+  const [myRequest, setMyRequest] = useState([]);
+  const [requestForBlood, setRequestForBlood] = useState([]);
+
+  useEffect(() => {
+    if (bloodRequest && userData) {
+      setRequestForBlood(
+        bloodRequest.filter(
+          blood =>
+            blood?.requestReceiver?.email === userData.email &&
+            blood?.requestReceiver?._id === userData._id
+        )
+      );
+
+      setMyRequest(
+        bloodRequest.filter(
+          blood =>
+            blood?.requestSender?.email === userData.email &&
+            blood?.requestSender?._id === userData._id
+        )
+      );
+    }
+  }, [bloodRequest, userData]);
+
+
+  // console.log(myRequest, requestForBlood)
 
   // --- Required fields for profile completeness
   const requiredFields = [
@@ -77,7 +105,7 @@ export default function DonorDashboard() {
       await logoutUser()
       router.push("/")
     } catch (err) {
-      console.error("Logout failed:", err)
+      // console.error("Logout failed:", err)
     }
   }
 
@@ -215,17 +243,22 @@ export default function DonorDashboard() {
 
         {/* Blood request section */}
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Recent Requests */}
-        <RecentBloodRequests bloodRequests={userData?.bloodRequest} />
+          <div className="col-span-1">
+            <RecentBloodRequests bloodRequests={requestForBlood} />
+          </div>
+
+          {/* Recent Requests */}
+          <div className="col-span-1">
+            <MyBloodRequestList bloodRequests={myRequest} />
+          </div>
+
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Profile Card */}
-
-
-            {/* Achievements */}
-            <Card className="p-6 bg-card border-border">
+          {/* <div className="space-y-6">  */}
+          {/* Achievements */}
+          {/* <Card className="p-6 bg-card border-border">
               <h3 className="font-semibold text-foreground mb-4">Recent Achievements</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
@@ -247,10 +280,10 @@ export default function DonorDashboard() {
                   </div>
                 </div>
               </div>
-            </Card>
+            </Card> */}
 
-            {/* Next Appointment */}
-            <Card className="p-6 bg-card border-border">
+          {/* Next Appointment */}
+          {/* <Card className="p-6 bg-card border-border">
               <h3 className="font-semibold text-foreground mb-4">Upcoming Appointment</h3>
               <div className="flex items-center gap-3 mb-4">
                 <Calendar className="h-5 w-5 text-primary" />
@@ -265,8 +298,8 @@ export default function DonorDashboard() {
               >
                 View Details
               </Button>
-            </Card>
-          </div>
+            </Card> */}
+          {/* </div> */}
         </div>
 
 

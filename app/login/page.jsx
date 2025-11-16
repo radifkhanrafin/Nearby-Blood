@@ -1,4 +1,5 @@
 "use client"
+export const dynamic = "force-dynamic"
 
 import { useState } from "react"
 import Link from "next/link"
@@ -9,35 +10,31 @@ import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
 import { Droplet, Mail, Lock } from "lucide-react"
 
-import { auth } from "@/lib/firebase" // Import your Firebase auth instance
-import { signInWithEmailAndPassword } from "firebase/auth"
 import { loginUser } from "@/lib/firebaseAuth"
 
 const LoginPage = () => {
-  
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const searchParams = useSearchParams();
-  const redirectPath = searchParams.get("redirect") || "/donor/dashboard";
 
-  const handleSubmit = async (e ) => {
+  const searchParams = useSearchParams()
+  const redirectPath = searchParams.get("redirect") || "/donor/dashboard"
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
     try {
-      // Firebase login
       const result = await loginUser(email, password)
       console.log(result.displayName)
       router.push(redirectPath)
     } catch (err) {
-  console.error("Login error:", err)
-  setError(err.message)
-}
- finally {
+      console.error("Login error:", err)
+      setError(err.message)
+    } finally {
       setIsLoading(false)
     }
   }
@@ -56,14 +53,10 @@ const LoginPage = () => {
 
         <Card className="p-8 bg-card border-border">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <p className="text-red-500 text-sm text-center">{error}</p>
-            )}
+            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">
-                Email
-              </Label>
+              <Label htmlFor="email" className="text-foreground">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
@@ -80,12 +73,8 @@ const LoginPage = () => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-foreground">
-                  Password
-                </Label>
-                <Link href="#" className="text-sm text-primary hover:underline">
-                  Forgot password?
-                </Link>
+                <Label htmlFor="password" className="text-foreground">Password</Label>
+                <Link href="#" className="text-sm text-primary hover:underline">Forgot password?</Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -112,9 +101,7 @@ const LoginPage = () => {
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             {"Don't have an account? "}
-            <Link href="/signup" className="text-primary hover:underline font-medium">
-              Sign up
-            </Link>
+            <Link href="/signup" className="text-primary hover:underline font-medium">Sign up</Link>
           </div>
         </Card>
 
