@@ -1,33 +1,23 @@
 'use client'
 
-import { useEffect, useState } from "react";
-import useAxiosSecure from "../lib/axios";
+import useAxiosSecure from '@/lib/axios';
+import { useQuery } from '@tanstack/react-query';
+ 
 export function useBloodRequest() {
-    const axiosSecure = useAxiosSecure();
-    const [bloodRequest, setBloodRequest] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const axiosSecure = useAxiosSecure();
 
+  const {
+    data: bloodRequest = [],
+    isLoading: loading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['bloodRequests'],
+    queryFn: async () => {
+      const response = await axiosSecure.get('/blood');
+      return response.data;
+    }
+  });
 
-
-    useEffect(() => {
-        const fetchBloodRequest = async () => {
-            try {
-                setLoading(true);
-                const response = await axiosSecure.get("/blood");  
-                // Extract only names
-                const Request = response.data;
-                setBloodRequest(Request);
-            } catch (err) {
-                console.error(err);
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchBloodRequest();
-    }, []);
-
-    return { bloodRequest, loading, error };
+  return { bloodRequest, loading, error, refetch };
 }

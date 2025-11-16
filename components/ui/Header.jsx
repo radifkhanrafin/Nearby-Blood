@@ -68,13 +68,13 @@ const Header = () => {
           {/* Profile Button   */}
 
 
-          <div className="relative inline-block">
+          <div className="relative inline-block ">
             {
               userData == null ? <Link href='/login' > Login</Link> : <button
                 onClick={goToDashboard}
-                className="h-10 w-10 bg-primary/20 text-primary flex items-center justify-center rounded-full"
+                className="h-10 w-10 bg-primary/20 text-primary flex items-center  justify-center rounded-full"
               >
-                <img className="h-12 w-16 object-cover rounded-full" src={userData?.profile} alt="profile" />
+                <img className="h-12 w-16 cursor-pointer object-cover rounded-full" src={userData?.profile} alt="profile" />
               </button>
             }
 

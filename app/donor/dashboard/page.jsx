@@ -7,14 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import {
-  Droplet,
-  MapPin,
-  Award,
-  Calendar,
-  Heart,
-  TrendingUp,
-  Users,
-  LogOut
+  Droplet, MapPin, Award, Calendar, Heart, TrendingUp, Users, LogOut
 } from "lucide-react"
 import { logoutUser } from "@/lib/firebaseAuth"
 import { useRouter } from "next/navigation"
@@ -24,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import RecentBloodRequests from "@/components/ui/bloodRequestList";
 import MyBloodRequestList from "@/components/ui/myBloodRequestList";
 import { useBloodRequest } from "@/hooks/useBloodRequest";
+import { toast } from "react-toastify"
 
 
 export default function DonorDashboard() {
@@ -89,7 +83,7 @@ export default function DonorDashboard() {
     }
   }, [userData])
 
-  // --- Safe destructuring with defaults
+
   const name = userData?.name || ""
   const profile = userData?.profile || "/default-profile.png"
   const bloodGroup = userData?.bloodGroup || ""
@@ -103,6 +97,7 @@ export default function DonorDashboard() {
   const handleLogout = async () => {
     try {
       await logoutUser()
+      toast("Logout Successful")
       router.push("/")
     } catch (err) {
       // console.error("Logout failed:", err)
@@ -246,12 +241,12 @@ export default function DonorDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Recent Requests */}
           <div className="col-span-1">
-            <RecentBloodRequests bloodRequests={requestForBlood} />
+            <RecentBloodRequests bloodRequests={requestForBlood} refetch={refetch} />
           </div>
 
           {/* Recent Requests */}
           <div className="col-span-1">
-            <MyBloodRequestList bloodRequests={myRequest} />
+            <MyBloodRequestList bloodRequests={myRequest} refetch={refetch} />
           </div>
 
 
@@ -306,9 +301,10 @@ export default function DonorDashboard() {
 
         {/* Logout */}
         <Button
+        
           variant="outline"
           onClick={handleLogout}
-          className="w-full my-6 border-border text-foreground hover:bg-secondary bg-transparent"
+          className="w-full my-6 border-border text-foreground hover:bg-secondary bg-transparent cursor-pointer hover:border-white"
         >
           Logout <LogOut />
         </Button>

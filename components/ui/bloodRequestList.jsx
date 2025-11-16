@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import useAxiosSecure from "@/lib/axios"
 import { toast } from "react-toastify"
 
-export default function RecentBloodRequests({ bloodRequests }) {
+export default function RecentBloodRequests({ bloodRequests, refetch }) {
   const axiosSecure = useAxiosSecure()
 
 
@@ -58,12 +58,8 @@ export default function RecentBloodRequests({ bloodRequests }) {
           >
             <div className="flex items-center gap-4 mb-2">
               <Avatar className="h-12 w-12 bg-primary/20 text-primary flex items-center justify-center">
-                <span className="text-sm font-semibold">
-                  {request.requestSender?.name
-                    ?.split(" ")
-                    .map((n) => n[0])
-                    .join("") || "?"}
-                </span>
+
+                <img className="h-12 w-12 " src={request?.requestSender?.profile} alt="" />
               </Avatar>
               <div>
                 <div className="font-semibold text-foreground">{request.requestSender?.name || "Unknown Donor"}</div>
@@ -81,10 +77,12 @@ export default function RecentBloodRequests({ bloodRequests }) {
               <p><span className="font-semibold text-foreground">Message:</span> {request.message || "-"}</p>
 
               {/* Status Select */}
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-foreground">Request Status:</span>
+
+              <div className="flex items-center gap-2  ">
+                <span className="font-semibold text-foreground ">Request Status:</span>
 
                 <Select
+
                   defaultValue={request.requestStatus}
                   onValueChange={(value) => handleStatusAction(request._id, value)}
                 >

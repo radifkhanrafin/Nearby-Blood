@@ -1,19 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useDonar } from "@/hooks/useDonar";
 import DonarCard from "../../components/ui/DonarCard";
 import { useUser } from "@/hooks/UserContext"
+import { useBloodRequest } from "@/hooks/useBloodRequest";
 
 export default function DonorMapPage() {
 
-  const { donars, loading, error } = useDonar();
+  const { donars, loading, refetch } = useDonar();
+  const { bloodRequest } = useBloodRequest();
   const { userData } = useUser();
+
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDistricts, setSelectedDistricts] = useState([]);
   const [selectedBloods, setSelectedBloods] = useState([]);
-
+  const [donar, setDonar] = useState();
+  
   const bangladeshDistricts = [
     "Bagerhat", "Bandarban", "Barguna", "Barisal", "Bhola", "Bogra", "Brahmanbaria", "Chandpur", "Chattogram", "Chuadanga",
     "Cox's Bazar", "Cumilla", "Dhaka", "Dinajpur", "Faridpur", "Feni", "Gaibandha", "Gazipur", "Gopalganj", "Habiganj",
@@ -32,8 +37,7 @@ export default function DonorMapPage() {
   // Filter donors dynamically and exclude logged-in user
   const filteredDonors = donars?.filter(donar => {
     if (!donar) return false;
-
-    // Exclude logged-in user
+ 
     if (userData && donar.registrationId === userData.registrationId) return false;
 
     const matchDistrict = selectedDistricts.length
@@ -144,8 +148,8 @@ export default function DonorMapPage() {
             Nearby Donors <span className="text-muted-foreground font-normal">({filteredDonors?.length || 0})</span>
           </h3>
           <div className="space-y-3 grid grid-cols-1 md:grid-cols-2 gap-8">
-            {filteredDonors?.map((donar) => (
-              <DonarCard key={donar.registrationId} donar={donar} />
+            {filteredDonors?.map((donar) => (   
+              <DonarCard key={donar.registrationId} donar={donar} refetch={refetch}   />
             ))}
             {!filteredDonors?.length && <p>No donors found.</p>}
           </div>

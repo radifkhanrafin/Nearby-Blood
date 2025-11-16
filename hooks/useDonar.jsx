@@ -1,33 +1,24 @@
 'use client'
 
-import { useEffect, useState } from "react";
-import useAxiosSecure from "../lib/axios";
+import useAxiosSecure from '@/lib/axios'
+import { useQuery } from '@tanstack/react-query' 
+
 export function useDonar() {
-    const axiosSecure = useAxiosSecure();
-    const [donars, setDonars] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const axiosSecure = useAxiosSecure()
 
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['donars'],  
+    queryFn: async () => {
+      const response = await axiosSecure.get('/users')
+      return response.data
+    },
+    staleTime: 1000 * 60 * 1,  
+    retry: 1, 
+    refetchInterval: 5000,  
+    refetchOnWindowFocus: true,  
+  })
 
-
-    useEffect(() => {
-        const fetchDonar = async () => {
-            try {
-                setLoading(true);
-                const response = await axiosSecure.get("/users");  
-                // Extract only names
-                const donar = response.data;
-                setDonars(donar);
-            } catch (err) {
-                console.error(err);
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDonar();
-    }, []);
-
-    return { donars, loading, error };
+  return {
+    donars: data || [],loading: isLoading,error,refetch,
+  }
 }

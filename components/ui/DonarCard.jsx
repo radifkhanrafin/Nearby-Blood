@@ -11,13 +11,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAxiosSecure from "@/lib/axios";
 import { useUser } from "@/hooks/UserContext";
+import { toast } from "react-toastify";
+import { useBloodRequest } from "@/hooks/useBloodRequest";
 
-const DonarCard = ({ donar }) => {
+const DonarCard = ({ donar, refetch, requestSent }) => {
 
   const { userData } = useUser();
+
   const {
     name,
     email,
@@ -34,17 +37,46 @@ const DonarCard = ({ donar }) => {
     registrationId,
     emergencyContact,
     presentAddress,
+    _id
   } = donar;
 
-  // Modal input states
+  const axiosSecure = useAxiosSecure();
+
+  const [disabled, setDisabled] = useState(false);
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("disabledDonors")) || {};
+    const expiry = saved[_id];
+
+    if (expiry && Date.now() < expiry) {
+      setDisabled(true);
+    } else if (expiry && Date.now() > expiry) {
+      // clear expired
+      delete saved[_id];
+      localStorage.setItem("disabledDonors", JSON.stringify(saved));
+    }
+  }, [_id]);
+
+  const disableFor10Minutes = () => {
+    const expiry = Date.now() + 600000; // 10 min
+    const saved = JSON.parse(localStorage.getItem("disabledDonors")) || {};
+
+    saved[_id] = expiry;
+
+    localStorage.setItem("disabledDonors", JSON.stringify(saved));
+    setDisabled(true);
+  };
+
+  // ========= MODAL STATES =========
   const [patientProblem, setPatientProblem] = useState("");
   const [needDate, setNeedDate] = useState("");
   const [needTime, setNeedTime] = useState("");
   const [location, setLocation] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [message, setMessage] = useState("");
-  const axiosSecure = useAxiosSecure();
-  const handleSendRequest = () => {
+
+  // ========= SEND REQUEST FUNCTION =========
+  const handleSendRequest = async () => {
     const newRequest = {
       requestReceiver: donar,
       patientProblem,
@@ -55,15 +87,20 @@ const DonarCard = ({ donar }) => {
       message,
       requestStatus: "pending",
       requestSender: userData
-
     };
 
+    const result = await axiosSecure.post('/blood', { newRequest });
 
-    const result = axiosSecure.post('/blood' , { newRequest });
+    if (result.status == 201) {
+      refetch();
+      toast.success("Your Request Sent Successfully", {
+        autoClose: 1500,
+      });
 
-     
+      // disable for 10 minutes
+      disableFor10Minutes();
+    }
   };
-
 
   return (
     <Card
@@ -150,8 +187,14 @@ const DonarCard = ({ donar }) => {
         {/* Send Request Modal */}
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="bg-primary text-white hover:bg-primary/90">
-              Send Request
+            <Button
+              disabled={disabled}
+              className={`text-white ${disabled
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-primary hover:bg-primary/90"
+                }`}
+            >
+              {disabled ? "Already Request" : "Send Request"}
             </Button>
           </DialogTrigger>
 
@@ -164,7 +207,7 @@ const DonarCard = ({ donar }) => {
 
               <input
                 type="text"
-                placeholder="Patient problem (রুগীর সমস্যা)"
+                placeholder="Patient problem "
                 className="border p-2 rounded-md"
                 value={patientProblem}
                 onChange={(e) => setPatientProblem(e.target.value)}
@@ -181,7 +224,7 @@ const DonarCard = ({ donar }) => {
               </div>
 
               <div className="flex flex-col">
-                <label className="text-sm text-muted-foreground">Time needed (সময়)</label>
+                <label className="text-sm text-muted-foreground">Time needed  </label>
                 <input
                   type="time"
                   className="border p-2 rounded-md"
@@ -189,18 +232,20 @@ const DonarCard = ({ donar }) => {
                   onChange={(e) => setNeedTime(e.target.value)}
                 />
               </div>
-
+              <label className="text-sm text-muted-foreground" htmlFor="location"> Blood Donation Location or Hospital</label>
               <input
                 type="text"
-                placeholder="Hospital / Location (হাসপাতাল/লোকেশন)"
+                id="location"
+                placeholder="Hospital / Location "
                 className="border p-2 rounded-md"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
               />
-
+              <label className="text-sm text-muted-foreground" htmlFor="number">Patient / Relative Phone Number</label>
               <input
-                type="text"
-                placeholder="Patient / Relative Phone Number"
+                id="number"
+                type="number"
+                placeholder="+88 01000 000000"
                 className="border p-2 rounded-md"
                 value={contactNumber}
                 onChange={(e) => setContactNumber(e.target.value)}
@@ -215,11 +260,16 @@ const DonarCard = ({ donar }) => {
             </div>
 
             <DialogFooter>
+
               <Button
                 onClick={handleSendRequest}
-                className="bg-primary text-white hover:bg-primary/90"
+                disabled={disabled}
+                className={`text-white ${disabled
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-primary hover:bg-primary/90"
+                  }`}
               >
-                Send Request
+                {disabled ? "Already Request" : "Send Request"}
               </Button>
             </DialogFooter>
           </DialogContent>

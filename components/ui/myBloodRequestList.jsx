@@ -4,15 +4,29 @@ import { Avatar } from "@/components/ui/avatar"
 import { Card } from "@/components/ui/card"
 import { MapPin, Edit, Trash2 } from "lucide-react"
 import useAxiosSecure from "@/lib/axios"
+import { toast } from "react-toastify"
 
-export default function MyBloodRequestList({ bloodRequests }) {
+export default function MyBloodRequestList({ bloodRequests, refetch }) {
     const axiosSecure = useAxiosSecure()
 
-    const onDelete = (id) => {
-        console.log(" onDelete", id);
-        const res = axiosSecure.delete(`blood/id/${id}`)
-        console.log(res)
-    }
+    const onDelete = async (id) => {
+        try {
+            console.log("Deleting request:", id);
+            const res = await axiosSecure.delete(`blood/id/${id}`);
+            console.log(res.data);
+
+            if (res.status == 200) {
+                refetch();
+                toast.success("Your Blood Request is Deleted", {
+                    autoClose: 1500,  
+                });
+            }
+
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to delete request");
+        }
+    };
 
     if (!bloodRequests || bloodRequests.length === 0) {
         return (
@@ -25,7 +39,7 @@ export default function MyBloodRequestList({ bloodRequests }) {
 
     return (
         <Card className="lg:col-span-2 p-6 bg-card border-border">
-            <h3 className="text-xl font-semibold text-foreground mb-4">Recent Blood Requests</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-4">My Requests - {bloodRequests.length}</h3>
             <div className="space-y-4">
                 {bloodRequests.map((request, i) => (
                     <div
@@ -46,12 +60,8 @@ export default function MyBloodRequestList({ bloodRequests }) {
 
                         <div className="flex items-center gap-4 mb-2">
                             <Avatar className="h-12 w-12 bg-primary/20 text-primary flex items-center justify-center">
-                                <span className="text-sm font-semibold">
-                                    {request.requestSender?.name
-                                        ?.split(" ")
-                                        .map((n) => n[0])
-                                        .join("") || "?"}
-                                </span>
+                               
+                                <img className="h-12 w-12 " src={request?.requestSender?.profile} alt="" />
                             </Avatar>
                             <div>
                                 <div className="font-semibold text-foreground">{request.requestSender?.name || "Unknown Donor"}</div>

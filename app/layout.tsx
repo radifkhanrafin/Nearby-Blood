@@ -1,3 +1,4 @@
+"use client"
 import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
@@ -10,20 +11,20 @@ import { UserProvider } from "../hooks/UserContext";
 import { ToastContainer } from 'react-toastify';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export const metadata: Metadata = {
-  title: 'Nearby Blood',
-  description: 'A different platform for searching blood',
-  generator: 'Radif',
-};
+// export const metadata: Metadata = {
+//   title: 'Nearby Blood',
+//   description: 'A different platform for searching blood',
+//   generator: 'Radif',
+// };
 
 // Create QueryClient once outside component
-// const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        {/* <QueryClientProvider client={queryClient}> */}
+        <QueryClientProvider client={queryClient}>
           <UserProvider>
             <ToastContainer />
             <Header />
@@ -32,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Analytics />
             <Footer />
           </UserProvider>
-        {/* </QueryClientProvider> */}
+        </QueryClientProvider>
       </body>
     </html>
   );

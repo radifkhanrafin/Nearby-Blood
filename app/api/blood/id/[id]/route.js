@@ -51,14 +51,16 @@ export const PATCH = async (req, { params }) => {
   }
 };
 
+
 export const DELETE = async (req, context) => {
   try {
     await connectDB();
+ 
+    const { params } = await context;
+    const id = params?.id;
 
-    // Await params first
-    const { params } = context;
-    const id = params?.id; // now safe to use
-console.log(id)
+    // console.log(id);
+
     if (!id) {
       return NextResponse.json({ error: "No ID provided" }, { status: 400 });
     }
@@ -69,10 +71,16 @@ console.log(id)
       return NextResponse.json({ error: "Blood request not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Blood request deleted successfully" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Blood request deleted successfully" },
+      { status: 200 }
+    );
 
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to delete blood request" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete blood request" },
+      { status: 500 }
+    );
   }
 };
