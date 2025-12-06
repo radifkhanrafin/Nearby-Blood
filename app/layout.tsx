@@ -5,8 +5,7 @@ import Providers from './provider';
 
 export const metadata = {
   title: 'Nearby Blood',
-  description: 'A different platform for searching blood',
-  generator: 'Radif'
+  description: 'A different platform for searching blood', 
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

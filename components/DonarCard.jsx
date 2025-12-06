@@ -13,12 +13,12 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import useAxiosSecure from "@/lib/axios"; 
-import { toast } from "react-toastify";
-import { useBloodRequest } from "@/hooks/useBloodRequest";
+import { toast } from "react-toastify"; 
+import useCurrentUser from "@/hooks/useCurrentUser";
 
-const DonarCard = ({ donar, refetch, requestSent }) => {
-
-  const { userData, loadingUser,refetchUser } = useCurrentUser()
+const DonarCard = ({ donar, refetch }) => {
+  const { userData } = useCurrentUser();
+  const axiosSecure = useAxiosSecure();
 
   const {
     name,
@@ -26,47 +26,43 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
     phone,
     gender,
     profile,
-    dateOfBirth,
     age,
     bloodGroup,
     weightKg,
     lastDonationDate,
     availability,
-    medicalHistory,
-    registrationId,
     emergencyContact,
     presentAddress,
-    _id
+    registrationId,
+    _id,
   } = donar;
 
-  const axiosSecure = useAxiosSecure();
-
+  // Disable state for 10 minutes
   const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("disabledDonors")) || {};
     const expiry = saved[_id];
 
-    if (expiry && Date.now() < expiry) {
-      setDisabled(true);
-    } else if (expiry && Date.now() > expiry) {
-      // clear expired
+    if (expiry && Date.now() < expiry) setDisabled(true);
+    else if (expiry && Date.now() > expiry) {
       delete saved[_id];
       localStorage.setItem("disabledDonors", JSON.stringify(saved));
     }
   }, [_id]);
 
   const disableFor10Minutes = () => {
-    const expiry = Date.now() + 600000; // 10 min
+    const expiry = Date.now() + 10 * 60 * 1000; // 10 minutes
     const saved = JSON.parse(localStorage.getItem("disabledDonors")) || {};
-
     saved[_id] = expiry;
-
     localStorage.setItem("disabledDonors", JSON.stringify(saved));
     setDisabled(true);
   };
 
-  // ========= MODAL STATES =========
+  // Modal state
+  const [open, setOpen] = useState(false);
+
+  // Request form states
   const [patientProblem, setPatientProblem] = useState("");
   const [needDate, setNeedDate] = useState("");
   const [needTime, setNeedTime] = useState("");
@@ -74,30 +70,38 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
   const [contactNumber, setContactNumber] = useState("");
   const [message, setMessage] = useState("");
 
-  // ========= SEND REQUEST FUNCTION =========
+  // Send request
   const handleSendRequest = async () => {
-    const newRequest = {
-      requestReceiver: donar,
-      patientProblem,
-      needDate,
-      needTime,
-      location,
-      contactNumber,
-      message,
-      requestStatus: "pending",
-      requestSender: userData
-    };
+    try {
+      const newRequest = {
+        requestReceiver: donar,
+        patientProblem,
+        needDate,
+        needTime,
+        location,
+        contactNumber,
+        message,
+        requestStatus: "pending",
+        requestSender: userData
+      };
 
-    const result = await axiosSecure.post('/blood', { newRequest });
+      const result = await axiosSecure.post('/blood', { newRequest });
 
-    if (result.status == 201) {
-      refetch();
-      toast.success("Your Request Sent Successfully", {
-        autoClose: 1500,
-      });
-
-      // disable for 10 minutes
-      disableFor10Minutes();
+      if (result.status === 201) {
+        refetch();
+        toast.success("Your Request Sent Successfully", { autoClose: 1500 });
+        disableFor10Minutes();
+        // clear form
+        setPatientProblem("");
+        setNeedDate("");
+        setNeedTime("");
+        setLocation("");
+        setContactNumber("");
+        setMessage("");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to send request");
     }
   };
 
@@ -121,9 +125,9 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
           </h3>
           <div className="flex gap-2 mt-1">
             {availability ? (
-              <Badge className="bg-green-500 text-white text-xs">Available</Badge>
+              <Badge className="bg-red-500 text-white text-xs rounded-full">Available</Badge>
             ) : (
-              <Badge className="bg-gray-400 text-white text-xs">Unavailable</Badge>
+              <Badge className="bg-gray-400 text-white text-xs rounded-full">Unavailable</Badge>
             )}
           </div>
         </div>
@@ -148,8 +152,7 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
         </div>
         {lastDonationDate && (
           <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" /> Last Donation:{" "}
-            {moment(lastDonationDate).format("MMM Do YY")}
+            <Calendar className="w-4 h-4" /> Last Donation: {moment(lastDonationDate).format("MMM Do YY")}
           </div>
         )}
       </div>
@@ -159,9 +162,7 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
         <div className="flex items-start gap-1">
           <MapPin className="w-4 h-4 mt-1" />
           <div>
-            <strong>Present Address:</strong> {presentAddress?.street},{" "}
-            {presentAddress?.city}, {presentAddress?.district},{" "}
-            {presentAddress?.postalCode}, {presentAddress?.country}
+            <strong>Present Address:</strong> {presentAddress?.street}, {presentAddress?.city}, {presentAddress?.district}
           </div>
         </div>
       </div>
@@ -169,8 +170,7 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
       {/* Emergency Contact */}
       {emergencyContact && (
         <div className="text-sm text-muted-foreground">
-          <strong>Emergency Contact:</strong> {emergencyContact.name} (
-          {emergencyContact.relation}) - {emergencyContact.phone}
+          <strong>Emergency Contact:</strong> {emergencyContact.name} ({emergencyContact.relation}) - {emergencyContact.phone}
         </div>
       )}
 
@@ -184,7 +184,7 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
         </Badge>
 
         {/* Send Request Modal */}
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button
               disabled={disabled}
@@ -203,17 +203,15 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
             </DialogHeader>
 
             <div className="flex flex-col gap-3">
-
               <input
                 type="text"
-                placeholder="Patient problem "
+                placeholder="Patient problem"
                 className="border p-2 rounded-md"
                 value={patientProblem}
                 onChange={(e) => setPatientProblem(e.target.value)}
               />
-
               <div className="flex flex-col">
-                <label className="text-sm text-muted-foreground">Date needed (তারিখ)</label>
+                <label className="text-sm text-muted-foreground">Date needed</label>
                 <input
                   type="date"
                   className="border p-2 rounded-md"
@@ -221,9 +219,8 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
                   onChange={(e) => setNeedDate(e.target.value)}
                 />
               </div>
-
               <div className="flex flex-col">
-                <label className="text-sm text-muted-foreground">Time needed  </label>
+                <label className="text-sm text-muted-foreground">Time needed</label>
                 <input
                   type="time"
                   className="border p-2 rounded-md"
@@ -231,37 +228,33 @@ const DonarCard = ({ donar, refetch, requestSent }) => {
                   onChange={(e) => setNeedTime(e.target.value)}
                 />
               </div>
-              <label className="text-sm text-muted-foreground" htmlFor="location"> Blood Donation Location or Hospital</label>
               <input
                 type="text"
-                id="location"
-                placeholder="Hospital / Location "
+                placeholder="Hospital / Location"
                 className="border p-2 rounded-md"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
               />
-              <label className="text-sm text-muted-foreground" htmlFor="number">Patient / Relative Phone Number</label>
               <input
-                id="number"
                 type="number"
-                placeholder="+88 01000 000000"
+                placeholder="Patient / Relative Phone Number"
                 className="border p-2 rounded-md"
                 value={contactNumber}
                 onChange={(e) => setContactNumber(e.target.value)}
               />
-
               <Textarea
                 placeholder="Write your message here..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
-
             </div>
 
             <DialogFooter>
-
               <Button
-                onClick={handleSendRequest}
+                onClick={async () => {
+                  await handleSendRequest();
+                  setOpen(false); // auto close modal
+                }}
                 disabled={disabled}
                 className={`text-white ${disabled
                   ? "bg-gray-400 cursor-not-allowed"

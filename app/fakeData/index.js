@@ -3,12 +3,26 @@ import {
 } from "lucide-react"
 
 
-export  const statsData = [
+
+export const bangladeshDistricts = [
+  "Bagerhat", "Bandarban", "Barguna", "Barisal", "Bhola", "Bogra", "Brahmanbaria",
+  "Chandpur", "Chattogram", "Chuadanga", "Cox's Bazar", "Cumilla", "Dhaka", "Dinajpur",
+  "Faridpur", "Feni", "Gaibandha", "Gazipur", "Gopalganj", "Habiganj", "Jamalpur",
+  "Jashore", "Jhalokati", "Jhenaidah", "Joypurhat", "Khagrachari", "Khulna",
+  "Kishoreganj", "Kurigram", "Kushtia", "Lakshmipur", "Lalmonirhat", "Madaripur",
+  "Magura", "Manikganj", "Meherpur", "Moulvibazar", "Munshiganj", "Mymensingh",
+  "Naogaon", "Narail", "Narsingdi", "Natore", "Nawabganj", "Netrokona", "Nilphamari",
+  "Noakhali", "Pabna", "Panchagarh", "Patuakhali", "Pirojpur", "Rajbari", "Rajshahi",
+  "Rangamati", "Rangpur", "Satkhira", "Shariatpur", "Sherpur", "Sirajganj",
+  "Sunamganj", "Sylhet", "Tangail", "Thakurgaon"
+];
+
+export const statsData = [
   {
     icon: Droplet,
     value: 12,
     label: "Total Donations",
-    extraIcon: "TrendingUp",
+    extraIcon: TrendingUp,
     bg: "bg-primary/10"
   },
   {

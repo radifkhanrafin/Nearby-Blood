@@ -22,6 +22,13 @@ const { userData, loadingUser,refetchUser } = useCurrentUser()
     { name: "About", href: "/about" },
     { name: "Find Donor", href: "/find-donar" },
     { name: "Request For Blood", href: userData ? "/request-blood" : "/login" },
+    // { name: "Profile", href: userData ? "/donor/dashboard" : "/login" },
+  ];
+  const navLinksMobile = [
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Find Donor", href: "/find-donar" },
+    { name: "Request For Blood", href: userData ? "/request-blood" : "/login" },
     { name: "Profile", href: userData ? "/donor/dashboard" : "/login" },
   ];
 
@@ -90,7 +97,7 @@ const { userData, loadingUser,refetchUser } = useCurrentUser()
         }`}
       >
         <nav className="flex flex-col gap-3 px-4">
-          {navLinks.map(link => (
+          {navLinksMobile.map(link => (
             <Link
               key={link.name}
               href={link.href}
